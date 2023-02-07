@@ -26,7 +26,7 @@ class AuthService {
     // user registration
     async register(data) {
         try {
-            const response = await axios.post(API_URL + 'register', data);
+            const response = await axios.post(API_URL + 'register', data, {headers: {'Content-Type': 'application/json'}});
 
             return response.data;
         } catch (error) {
