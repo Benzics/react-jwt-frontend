@@ -1,4 +1,4 @@
-import { Button, Form, Container } from "react-bootstrap";
+import { Button, Form, Container, Alert } from "react-bootstrap";
 import { useFormik } from "formik";
 import {useState} from "react";
 import * as Yup from 'yup';
@@ -9,7 +9,10 @@ import { Link } from "react-router-dom";
 const Register = () => {
 
     const [successful, setSuccessful] = useState(false);
+    const [loading, setLoading] = useState(false);
+
     const dispatch = useDispatch();
+    const { message } = useSelector(state => state.message);
 
     const formik = useFormik({
         initialValues: {
@@ -37,6 +40,8 @@ const Register = () => {
             .max(50, 'Must be at most 50 characters')
         }),
         onSubmit: (values) => {
+            setLoading(true);
+
             let formData = new FormData();
             formData.append('email', values.email);
             formData.append('password', values.password);
@@ -49,12 +54,12 @@ const Register = () => {
             })
             dispatch(register(formData))
                 .then(() => {
-                    console.log('registered');
+                    setLoading(false);
                     setSuccessful(true);
                 })
                 .catch((e) => {
                 setSuccessful(false);
-                console.log('something wrong', e)
+                setLoading(false);
             });
         },
     });
@@ -62,6 +67,12 @@ const Register = () => {
 
     return (
         <Container>
+        <h3 className="mb-4">Have an account? <Link to="/login">Login</Link></h3>
+
+        {message && !successful && (
+            <Alert variant="danger">{message}</Alert>
+        )}
+
         <Form onSubmit={formik.handleSubmit} encType='multipart/form-data'>
             <Form.Group>
                 <Form.Label>First Name</Form.Label>
@@ -74,7 +85,7 @@ const Register = () => {
                     name="firstName"
                 />
                 {formik.touched.firstName && formik.errors.firstName ? 
-                 (<div type="invalid">{formik.errors.firstName}</div>) : null}
+                 (<Alert variant="danger">{formik.errors.firstName}</Alert>) : null}
             </Form.Group>
 
             <Form.Group>
@@ -88,7 +99,7 @@ const Register = () => {
                     name="lastName"
                 />
                  {formik.touched.lastName && formik.errors.lastName ? 
-                 (<div>{formik.errors.lastName}</div>) : null}
+                 (<Alert variant="danger">{formik.errors.lastName}</Alert>) : null}
             </Form.Group>
 
             <Form.Group>
@@ -102,7 +113,7 @@ const Register = () => {
                     name="email"
                 />
                 {formik.touched.email && formik.errors.email ? 
-                 (<div type="invalid">{formik.errors.email}</div>) : null}
+                 (<Alert variant="danger">{formik.errors.email}</Alert>) : null}
             </Form.Group>
 
             <Form.Group>
@@ -115,6 +126,8 @@ const Register = () => {
                     id="password"
                     name="password"
                 />
+                {formik.touched.password && formik.errors.password ? 
+                 (<Alert variant="danger">{formik.errors.password}</Alert>) : null}
             </Form.Group>
 
             <Form.Group>
@@ -131,12 +144,12 @@ const Register = () => {
                     />
             </Form.Group>
 
-            <Button variant="primary" className="mt-2 mb-2" type="submit">Register</Button>
+            <Button variant="primary" className="mt-2 mb-2" disabled={loading} type="submit">Register</Button>
         </Form>
         {successful && (
-         <div className="alert alert-success">Registration successful 
+        <Alert variant="success"> Registration successful 
          <Link to="/login">Login now</Link>
-         </div>
+         </Alert>
         )}
         </Container>
     )

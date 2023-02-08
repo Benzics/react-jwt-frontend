@@ -5,34 +5,25 @@ const API_URL = 'http://localhost:8000/api/users/';
 class AuthService {
     // our login function
     async login(username, password) {
-        try {
-            const response = await axios.post(API_URL + 'login', {
-                username: username,
-                password: password,
-            });
-            
-            if(response.data.token) {
-                localStorage.setItem('token', response.data.token);
-            }
-
-            return true;
-        } catch (error) {
-            console.log(error);
+       
+        const response = await axios.post(API_URL + 'login', {
+            username: username,
+            password: password,
+        });
+        if(response.data.token) {
+            localStorage.setItem('token', response.data.token);
         }
+        
+        return response.data;
 
-        return false;
+
     }
 
     // user registration
     async register(data) {
-        try {
-            const response = await axios.post(API_URL + 'register', data, {headers: {'Content-Type': 'application/json'}});
+        const response = await axios.post(API_URL + 'register', data, {headers: {'Content-Type': 'multipart/form-data'}});
 
-            return response.data;
-        } catch (error) {
-            console.log(error);
-        }
-        return false;
+        return response.data;
     }
 
     getUserToken() {
